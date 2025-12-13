@@ -6,6 +6,12 @@ export class User {
     @PrimaryGeneratedColumn({ type: 'bigint' })
     id: string;
 
+    @Column({ name: 'kakao_id', type: 'bigint', unique: true, nullable: true })
+    kakaoId: string | null;
+
+    @Column({ type: 'varchar', length: 255, unique: true })
+    email: string;
+
     @Column({ type: 'varchar', length: 255, nullable: true })
     password: string | null; // bcrypt 해시값 저장
 
