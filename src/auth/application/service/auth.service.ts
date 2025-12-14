@@ -37,6 +37,7 @@ export class AuthService {
             new CreateUserCommand(email, hashedPassword, nickname),
         );
 
+        console.log(user);
     }
 
 }
