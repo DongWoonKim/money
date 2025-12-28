@@ -10,7 +10,7 @@ export class UserWriter implements IUserWriter {
     constructor(
         @InjectRepository(User) private readonly userRepository: Repository<User>,
     ) {}
-    // Implement methods for writing user data
+
     createUser(dto: CreateUserDto): Promise<User> {
          const user = this.userRepository.create({
             email: dto.email,
@@ -19,6 +19,10 @@ export class UserWriter implements IUserWriter {
             kakaoId: null,
             profileImage: null,
         });
+        return this.userRepository.save(user);
+    }
+
+    save(user: User): Promise<User> {
         return this.userRepository.save(user);
     }
 }   

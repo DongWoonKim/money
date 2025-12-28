@@ -1,6 +1,9 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { CqrsModule } from "@nestjs/cqrs";
+import { JwtModule } from "@nestjs/jwt";
+import { PassportModule } from "@nestjs/passport";
+import { ConfigService } from "@nestjs/config";
 import { AuthController } from "./interface/http/auth.controller";
 import { UserReader } from "./infrastructure/persistence/user.reader";
 import { UserWriter } from "./infrastructure/persistence/user.writer";
@@ -8,26 +11,35 @@ import { AuthService } from "./application/service/auth.service";
 import { GetUserByEmailQueryHandler, GetUserByIdQueryHandler } from "./application/query/handler/get-user.handler";
 import { CreateUserCommandHandler } from "./application/command/handler/create-user.handler";
 import { User } from "./infrastructure/entity/user.entity";
+import { JwtTokenProvider } from "./infrastructure/jwt-token.provider";
+import { JwtStrategy } from "./infrastructure/jwt.strategy";
 
 const CommandHandlers = [
-    // Add command handlers here
     CreateUserCommandHandler,
 ];
 
 const QueryHandlers = [
-    // Add query handlers here
     GetUserByIdQueryHandler,
     GetUserByEmailQueryHandler
 ];
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([User]),  // default 연결 사용
+        TypeOrmModule.forFeature([User]),
+        PassportModule.register({ defaultStrategy: 'jwt' }),
         CqrsModule,
+        JwtModule.registerAsync({
+            inject: [ConfigService],
+            useFactory: (config: ConfigService) => ({
+                secret: config.get<string>('JWT_SECRET', 'your-super-secret-key-change-in-production'),
+            }),
+        }),
     ],
     controllers: [AuthController],
     providers: [
         AuthService,
+        JwtTokenProvider,
+        JwtStrategy,
         ...CommandHandlers,
         ...QueryHandlers,
         {
@@ -39,6 +51,6 @@ const QueryHandlers = [
             useClass:  UserWriter
         },
     ],
-    exports: [AuthService]
+    exports: [AuthService, JwtStrategy]
 })
 export class AuthModule {}

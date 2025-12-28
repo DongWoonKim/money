@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MoneyModule } from './money/money.module';
 import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 
 // 데이터베이스 연결 매핑: [연결명, 데이터베이스명]
 const DATABASE_CONNECTIONS = {
@@ -12,9 +13,10 @@ const DATABASE_CONNECTIONS = {
 } as const;
 
 @Module({
-  imports: [ 
+  imports: [
     MoneyModule,
     AuthModule,
+    UserModule,
     // 환경 변수 로드
     ConfigModule.forRoot({
       isGlobal: true,
